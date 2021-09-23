@@ -1,0 +1,259 @@
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(forcats)
+
+StormData <- read.csv("StormData.csv", stringsAsFactors = FALSE)
+# CLEANING DATA
+# add new column for permitted storm data events (according instruction)
+StormData$evtype <- tolower(StormData$EVTYPE)
+
+# transform EVTYPE to the permitted storm data events (from instruction)
+StormData$evtype[StormData$evtype == 'avalance'] <- 'avalanche'
+StormData$evtype[StormData$evtype == 'blowing snow'] <- 'blizzard'
+StormData$evtype[StormData$evtype == 'cold'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold temprature'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold wave'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold/winds'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'low temperature'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'unseasonably cold'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold temperature'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold wave'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold weather'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'cold/winds'] <- 'cold/wind chill'
+StormData$evtype[StormData$evtype == 'extreme cold'] <- 'extreme cold/wind chill'
+StormData$evtype[StormData$evtype == 'extreme cold/wind chill'] <- 'extreme cold/wind chill'
+StormData$evtype[StormData$evtype == 'extreme windchill'] <- 'extreme cold/wind chill'
+StormData$evtype[StormData$evtype == 'extended cold'] <- 'extreme cold/wind chill'
+StormData$evtype[StormData$evtype == 'record cold'] <- 'extreme cold/wind chill'
+StormData$evtype[StormData$evtype == 'extreme heat'] <- 'excessive heat'
+StormData$evtype[StormData$evtype == 'record/excessive heat'] <- 'excessive heat'
+StormData$evtype[StormData$evtype == 'flash flooding'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'flood/flash flood'] <- 'flood'
+StormData$evtype[StormData$evtype == 'flooding'] <- 'flood'
+StormData$evtype[StormData$evtype == 'river flood'] <- 'flood'
+StormData$evtype[StormData$evtype == 'river flooding'] <- 'flood'
+StormData$evtype[StormData$evtype == 'drowning'] <- 'flood'
+StormData$evtype[StormData$evtype == 'excessive rainfall'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'flood & heavy rain'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'flash floods'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'flash flooding/flood'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'flash flood/flood'] <- 'flash flood'
+StormData$evtype[StormData$evtype == 'coastal flooding'] <- 'coastal flood'
+StormData$evtype[StormData$evtype == 'coastal flooding/erosion'] <- 'coastal flood'
+StormData$evtype[StormData$evtype == 'frost'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'black ice'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'glaze'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'ice'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'icy roads'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'ice on road'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'ice roads'] <- 'frost/freeze'
+StormData$evtype[StormData$evtype == 'gusty winds'] <- 'gusty wind'
+StormData$evtype[StormData$evtype == 'heat wave drought'] <- 'drought'
+StormData$evtype[StormData$evtype == 'drought/excessive heat'] <- 'drought'
+StormData$evtype[StormData$evtype == 'heat wave'] <- 'heat'
+StormData$evtype[StormData$evtype == 'record heat'] <- 'heat'
+StormData$evtype[StormData$evtype == 'unseasonably warm'] <- 'heat'
+StormData$evtype[StormData$evtype == 'heavy surf'] <- 'high surf'
+StormData$evtype[StormData$evtype == 'heavy surf/high surf'] <- 'high surf'
+StormData$evtype[StormData$evtype == 'rough surf'] <- 'high surf'
+StormData$evtype[StormData$evtype == 'hazardous surf'] <- 'high surf'
+StormData$evtype[StormData$evtype == 'high waves'] <- 'high surf'
+StormData$evtype[StormData$evtype == 'high winds'] <- 'high wind'
+StormData$evtype[StormData$evtype == 'high wind  and seas'] <- 'high wind'
+StormData$evtype[StormData$evtype == 'landslide'] <- 'debris flow'
+StormData$evtype[StormData$evtype == 'land slides'] <- 'debris flow'
+StormData$evtype[StormData$evtype == 'landslides'] <- 'debris flow'
+StormData$evtype[StormData$evtype == 'mudslide'] <- 'debris flow'
+StormData$evtype[StormData$evtype == 'mudslides'] <- 'debris flow'
+StormData$evtype[StormData$evtype == 'marine tstm wind'] <- 'marine thunderstorm wind'
+StormData$evtype[StormData$evtype == 'rip currents'] <- 'rip current'
+StormData$evtype[StormData$evtype == 'rip currents/heavy surf'] <- 'rip current'
+StormData$evtype[StormData$evtype == 'strong winds'] <- 'strong wind'
+StormData$evtype[StormData$evtype == 'gusty wind'] <- 'strong wind'
+StormData$evtype[StormData$evtype == 'gusty winds'] <- 'strong wind'
+StormData$evtype[StormData$evtype == 'winds'] <- 'strong wind'
+StormData$evtype[StormData$evtype == 'wind'] <- 'strong wind'
+StormData$evtype[StormData$evtype == 'hurricane erin'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane opal'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane opal/high winds'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane edouard'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane emily'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane felix'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'hurricane'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'typhoon'] <- 'hurricane/typhoon'
+StormData$evtype[StormData$evtype == 'dry microburst'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'dry mircoburst winds'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm winds'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thundersnow'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm winds'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm wind (g40)'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm wind g52'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm winds 13'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm windss'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorms winds'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstorm winds/hail'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thunderstormw'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'thundertormw winds'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'tstm wind (g35)'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'tstm wind (g40)'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'tstm wind (g45)'] <- 'thunderstorm wind'
+StormData$evtype[StormData$evtype == 'freezing drizzle'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'freezing rain'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'light snow'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'snow'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'snow and ice'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'winter weather/mix'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'winter weather mix'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'wintry mix'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'falling snow/ice'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'cold and snow'] <- 'winter weather'
+StormData$evtype[StormData$evtype == 'winter storms'] <- 'winter storm'
+StormData$evtype[StormData$evtype == 'heavy snow and high winds'] <- 'winter storm'
+StormData$evtype[StormData$evtype == 'snow squall'] <- 'winter storm'
+StormData$evtype[StormData$evtype == 'snow squalls'] <- 'winter storm'
+StormData$evtype[StormData$evtype == 'glaze/ ice storm'] <- 'ice storm'
+StormData$evtype[StormData$evtype == 'ice storm/flash flood'] <- 'ice storm'
+StormData$evtype[StormData$evtype == 'heavy snow shower'] <- 'heavy snow'
+StormData$evtype[StormData$evtype == 'heavy snow/ice'] <- 'heavy snow'
+StormData$evtype[StormData$evtype == 'coastal storm'] <- 'tropical storm'
+StormData$evtype[StormData$evtype == 'coastalstorm'] <- 'tropical storm'
+StormData$evtype[StormData$evtype == 'tropical storm gordon'] <- 'tropical storm'
+StormData$evtype[StormData$evtype == 'storm surge'] <- 'storm surge/tide'
+StormData$evtype[StormData$evtype == 'tstm wind'] <- 'tsunami'
+StormData$evtype[StormData$evtype == 'tstm wind/hail'] <- 'tsunami'
+StormData$evtype[StormData$evtype == 'waterspout'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'waterspout/tornado'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'tornado f2'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'tornado f3'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'tornadoes, tstm wind, hail'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'waterspout tornado'] <- 'tornado'
+StormData$evtype[StormData$evtype == 'urban/sml stream fld'] <- 'heavy rain'
+StormData$evtype[StormData$evtype == 'heavy rains'] <- 'heavy rain'
+StormData$evtype[StormData$evtype == 'wild fires'] <- 'wildfires'
+StormData$evtype[StormData$evtype == 'wildfires'] <- 'wildfires'
+StormData$evtype[StormData$evtype == 'wild/forest fire'] <- 'wildfires'
+StormData$evtype[StormData$evtype == 'lightning.'] <- 'lightning'
+StormData$evtype[StormData$evtype == 'lightning injury'] <- 'lightning'
+StormData$evtype[StormData$evtype == 'small hail'] <- 'hail'
+
+# corvert evtype to factor
+StormData$evtype <- as.factor(StormData$evtype)
+
+# adding new columns for transformation letter describing multiplier 
+StormData$propexp <- StormData$PROPDMGEXP
+StormData$cropexp <- StormData$CROPDMGEXP 
+
+# replace letter with according multiplier 
+StormData$propexp <- gsub("b", 1000000000, StormData$propexp, ignore.case = TRUE)
+StormData$propexp <- gsub("m", 1000000, StormData$propexp, ignore.case = TRUE)
+StormData$propexp <- gsub("k", 1000, StormData$propexp, ignore.case = TRUE)
+StormData$propexp <- gsub("h", 100, StormData$propexp, ignore.case = TRUE)
+StormData$cropexp <- gsub("b", 1000000000, StormData$cropexp, ignore.case = TRUE)
+StormData$cropexp <- gsub("m", 1000000, StormData$cropexp, ignore.case = TRUE)
+StormData$cropexp <- gsub("k", 1000, StormData$cropexp, ignore.case = TRUE)
+StormData$cropexp <- gsub("h", 100, StormData$cropexp, ignore.case = TRUE)
+# convert to numeric
+StormData$propexp <- as.numeric(StormData$propexp)
+StormData$cropexp <- as.numeric(StormData$cropexp)
+
+# summarise Fatalities, Injuries, Prop&Crop Damage per event type
+gr.evtype <- StormData %>% group_by(evtype) %>% summarise(fatal = sum(FATALITIES),
+        injur= sum(INJURIES), propcrop = sum(PROPDMG * propexp, na.rm = TRUE) + sum(CROPDMG*cropexp, na.rm = TRUE))
+
+# create data frame for health data
+health.evtype <- filter(gr.evtype, (fatal != 0 | injur != 0))
+# create data frame for economic data
+dmg.evtype <- filter(gr.evtype, (propcrop != 0))
+
+# calculate proportions for every event type
+health.evtype$prop_fatal <- health.evtype$fatal/sum(health.evtype$fatal) * 100
+health.evtype$prop_injur <- health.evtype$injur/sum(health.evtype$injur) * 100
+
+dmg.evtype$prop_pc <- dmg.evtype$propcrop/sum(dmg.evtype$propcrop) * 100
+
+# set the significant level 80%
+sign_level <- 80
+
+# make a new data frame with event types describing significant level of injuries
+health.evtype <- health.evtype %>% select(evtype, fatal,injur, prop_fatal, prop_injur) %>% arrange(desc(injur))
+injures_sum <- 0
+mostinjures <- NULL
+for (i in 1:nrow(health.evtype)) {
+    mostinjures <- rbind(mostinjures,health.evtype[i,c(1,3,5)])
+    injures_sum <- injures_sum + health.evtype$prop_injur[i] 
+    goal <-  ifelse(injures_sum >= sign_level, TRUE, FALSE)
+    if (goal == TRUE) {
+        break
+    }
+}
+# make a new data frame with evtypes describing significant level of fatalities
+health.evtype <- arrange(health.evtype , desc(fatal))
+fatal_sum <- 0
+mostfatal <- NULL
+for (i in 1:nrow(health.evtype)) {
+    mostfatal <- rbind(mostfatal,health.evtype[i,c(1,2,4)])
+    fatal_sum <- fatal_sum + health.evtype$prop_fatal[i] 
+    goal <-  ifelse(fatal_sum >= sign_level, TRUE, FALSE)
+    if (goal == TRUE) {
+        break
+    }
+}    
+# make the new data frames with evtypes describing significant level of prop&crop damage
+dmg.evtype <- dmg.evtype %>% select(evtype, propcrop, prop_pc) %>% arrange(desc(propcrop))
+prop_sum <- 0
+mostpropcrop <- NULL
+for (i in 1:nrow(health.evtype)) {
+    mostpropcrop <- rbind(mostpropcrop,dmg.evtype[i,c(1,2,3)])
+    prop_sum <- prop_sum + dmg.evtype$prop_pc[i] 
+    goal <-  ifelse(prop_sum >= sign_level, TRUE, FALSE)
+    if (goal == TRUE) {
+        break
+    }
+}  
+# sort event types in descending order of injures 
+mostinjures$evtype <- fct_reorder(mostinjures$evtype,mostinjures$injur)
+# create barplot for injuries
+ggplot(mostinjures, aes(x = evtype, y = injur, fill = evtype)) +
+    geom_col(colour = 'black', width = 0.5) +
+    labs(title = 'Injuries per Event Type* in USA (1950 - 2011)', 
+         subtitle = "*event types describing 80% of total injuries", 
+         x = "Event type",  y = "Injuries") +
+    coord_flip() +
+    theme_bw() +
+    theme(legend.position = "none") +
+    scale_fill_brewer(palette = "Set1")
+
+# sort event types in descending order of fatalities
+mostfatal$evtype <- fct_reorder(mostfatal$evtype,mostfatal$fatal)
+# create barplot for fatalities
+ggplot(mostfatal, aes(x = evtype, y = fatal, fill = evtype)) +
+    geom_col(colour = 'black', ) +
+    labs(title = 'Fatalities per Event Type* in USA (1950-2011)', 
+         subtitle = "*event types describing 80% of total fatalities", 
+         x = "Event type", y = "Fatalities") +
+    coord_flip() + 
+    theme_bw() +
+    theme(legend.position = "none") +
+    scale_fill_brewer(palette = "Set1")
+
+# sort event types in descending order of fatalities
+mostpropcrop$evtype <- fct_reorder(mostpropcrop$evtype,mostpropcrop$propcrop)    
+# create barplot for economic consequences 
+ggplot(mostpropcrop, aes(x = evtype, y = propcrop/1000000000, fill = evtype)) +
+    geom_col(colour = 'black') +
+    labs(title = "Damage per Event Type* in USA (1950-2011)", 
+         subtitle = "*event types describing 80% of total damage ", 
+         x = "Event type", y = "Damage (billion dollars)") +
+    coord_flip() +
+    theme_bw() +
+    theme(legend.position = "none") +
+    scale_fill_brewer(palette = "Set1")
+
+
+
+
+
+
+
